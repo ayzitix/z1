@@ -44,13 +44,14 @@ import { INotificationService } from '../../../../platform/notification/common/n
 import { Link } from '../../../../platform/opener/browser/link.js';
 import { IOpenerService } from '../../../../platform/opener/common/opener.js';
 import { IProductService } from '../../../../platform/product/common/productService.js';
+import { IFileDialogService } from '../../../../platform/dialogs/common/dialogs.js';
 import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
 import { IStorageService, StorageScope, StorageTarget, WillSaveStateReason } from '../../../../platform/storage/common/storage.js';
 import { firstSessionDateStorageKey, ITelemetryService, TelemetryLevel } from '../../../../platform/telemetry/common/telemetry.js';
 import { getTelemetryLevel } from '../../../../platform/telemetry/common/telemetryUtils.js';
 import { defaultButtonStyles, defaultKeybindingLabelStyles, defaultToggleStyles } from '../../../../platform/theme/browser/defaultStyles.js';
 import { IWindowOpenable } from '../../../../platform/window/common/window.js';
-import { IWorkspaceContextService, UNKNOWN_EMPTY_WINDOW_WORKSPACE } from '../../../../platform/workspace/common/workspace.js';
+import { IWorkspaceContextService, UNKNOWN_EMPTY_WINDOW_WORKSPACE, WorkbenchState } from '../../../../platform/workspace/common/workspace.js';
 import { IRecentFolder, IRecentWorkspace, IRecentlyOpened, IWorkspacesService, isRecentFolder, isRecentWorkspace } from '../../../../platform/workspaces/common/workspaces.js';
 import { OpenRecentAction } from '../../../browser/actions/windowActions.js';
 import { OpenFileFolderAction, OpenFolderAction, OpenFolderViaWorkspaceAction } from '../../../browser/actions/workspaceActions.js';
@@ -197,6 +198,7 @@ export class GettingStartedPage extends EditorPane {
 		@IEditorGroupsService private readonly groupsService: IEditorGroupsService,
 		@IContextKeyService contextService: IContextKeyService,
 		@IQuickInputService private quickInputService: IQuickInputService,
+		@IFileDialogService private readonly fileDialogService: IFileDialogService,
 		@IWorkspacesService private readonly workspacesService: IWorkspacesService,
 		@ILabelService private readonly labelService: ILabelService,
 		@IHostService private readonly hostService: IHostService,
@@ -225,6 +227,12 @@ export class GettingStartedPage extends EditorPane {
 
 		this.contextService = this._register(contextService.createScoped(this.container));
 		inWelcomeContext.bindTo(this.contextService).set(true);
+
+		this._register(this.workspaceContextService.onDidChangeWorkbenchState(() => {
+			if (this.workspaceContextService.getWorkbenchState() !== WorkbenchState.EMPTY) {
+				void this.closeZ1Welcome();
+			}
+		}));
 
 		this.gettingStartedCategories = this.gettingStartedService.getWalkthroughs();
 
@@ -917,6 +925,12 @@ export class GettingStartedPage extends EditorPane {
 		append(brand, $('span.z1-welcome-name', {}, 'z1'));
 
 		const grid = append(inner, $('.z1-welcome-grid'));
+		const runAfter = (action: () => Promise<unknown> | void): void => {
+			void (async () => {
+				await action();
+				await this.closeZ1Welcome();
+			})();
+		};
 		const addCard = (icon: string, label: string, action: () => void, className?: string): HTMLButtonElement => {
 			const card = append(grid, $('button.z1-welcome-card')) as HTMLButtonElement;
 			card.setAttribute('type', 'button');
@@ -930,28 +944,54 @@ export class GettingStartedPage extends EditorPane {
 			return card;
 		};
 
-		addCard('folder', 'Open project', () => this.commandService.executeCommand('workbench.action.files.openFolder'), 'z1-welcome-open');
-		addCard('repo', 'Clone repo', () => this.commandService.executeCommand('git.clone'));
-		addCard('terminal', 'Connect via SSH', () => this.connectViaSSH());
+		addCard('folder', 'Open project', () => { void this.openProject(); }, 'z1-welcome-open');
+		addCard('repo', 'Clone repo', () => runAfter(() => this.commandService.executeCommand('git.clone')));
+		addCard('terminal', 'Connect via SSH', () => { void this.connectViaSSH().then(started => { if (started) { void this.closeZ1Welcome(); } }); });
 		addCard('info', 'About z1', () => this.commandService.executeCommand('workbench.action.showAboutDialog'));
 
 		this.container.appendChild(page);
 	}
 
-	private async connectViaSSH(): Promise<void> {
+	private async openProject(): Promise<void> {
+		const folder = (await this.fileDialogService.showOpenDialog({
+			openLabel: localize('z1.openProject.open', "Open"),
+			title: localize('z1.openProject.title', "Open Project"),
+			canSelectFiles: false,
+			canSelectFolders: true,
+			canSelectMany: false,
+			defaultUri: await this.fileDialogService.defaultFolderPath()
+		}))?.[0];
+		if (!folder) {
+			return;
+		}
+
+		await this.closeZ1Welcome();
+		await this.hostService.openWindow([{ folderUri: folder }], { forceNewWindow: false });
+	}
+
+	private async closeZ1Welcome(): Promise<void> {
+		const input = this.editorInput;
+		if (input) {
+			await this.group.closeEditor(input);
+		}
+	}
+
+	private async connectViaSSH(): Promise<boolean> {
 		const host = await this.quickInputService.input({
 			prompt: localize('z1.connectSsh.prompt', "Connect to an SSH host"),
 			placeHolder: localize('z1.connectSsh.placeholder', "user@host")
 		});
 		if (!host) {
-			return;
+			return false;
 		}
 
 		try {
 			await this.commandService.executeCommand('workbench.action.terminal.new');
 			await this.commandService.executeCommand('workbench.action.terminal.sendSequence', { text: `ssh ${host}\n` });
+			return true;
 		} catch (error) {
 			this.notificationService.warn(localize('z1.connectSsh.failed', "Could not start SSH session: {0}", String(error)));
+			return false;
 		}
 	}
 

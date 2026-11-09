@@ -1286,6 +1286,10 @@
 	background: #ffffff !important;
 }
 
+.z1-welcome-card.z1-welcome-open .codicon {
+	color: #2A2A2A !important;
+}
+
 
 @media (max-width: 640px) {
 	.z1-welcome-page {
