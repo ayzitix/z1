@@ -1276,13 +1276,13 @@
 	line-height: 20px;
 }
 
-.z1-welcome-card.z1-welcome-about {
+.z1-welcome-card.z1-welcome-open {
 	background: #f5f5f5 !important;
 	color: #141414 !important;
 	border-color: #f5f5f5 !important;
 }
 
-.z1-welcome-card.z1-welcome-about:hover {
+.z1-welcome-card.z1-welcome-open:hover {
 	background: #ffffff !important;
 }
 

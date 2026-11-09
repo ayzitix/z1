@@ -930,10 +930,10 @@ export class GettingStartedPage extends EditorPane {
 			return card;
 		};
 
-		addCard('folder', 'Open project', () => this.commandService.executeCommand('workbench.action.files.openFolder'));
+		addCard('folder', 'Open project', () => this.commandService.executeCommand('workbench.action.files.openFolder'), 'z1-welcome-open');
 		addCard('repo', 'Clone repo', () => this.commandService.executeCommand('git.clone'));
 		addCard('terminal', 'Connect via SSH', () => this.connectViaSSH());
-		addCard('info', 'About z1', () => this.commandService.executeCommand('workbench.action.showAboutDialog'), 'z1-welcome-about');
+		addCard('info', 'About z1', () => this.commandService.executeCommand('workbench.action.showAboutDialog'));
 
 		this.container.appendChild(page);
 	}

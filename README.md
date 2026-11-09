@@ -54,7 +54,6 @@ See [BUILD.md](BUILD.md) for details and notes.
 | `build/` | build system |
 | `resources/` | icons and Linux packaging resources |
 | `branding/` | z1 logo, PNG/ICO sizes, watermarks, theme JSON sources |
-| `z1/patches/` | recorded z1 source patches (for reference/upstream updates) |
 | `product.json` | z1 product identity (name, gallery, URLs) |
 | `package.json` | source package metadata |
 
