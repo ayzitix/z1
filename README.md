@@ -45,6 +45,26 @@ renames it and is the recommended entry point:
 
 See [BUILD.md](BUILD.md) for details and notes.
 
+## Development (watch)
+
+For UI iteration, do not run the full build. In one terminal:
+
+```bash
+npm run watch
+```
+
+In another terminal, launch the dev build:
+
+```bash
+./scripts/code.sh
+```
+
+`watch` recompiles only changed sources. For a quick change to the already
+packaged app, CSS can be edited in
+`z1-linux-x64/resources/app/out/vs/workbench/workbench.desktop.main.css` and
+the window reloaded; TypeScript changes are reflected by `watch` + the dev app.
+A full `./z1-build.sh` is only needed for a new portable artifact.
+
 ## Repository layout
 
 | path | contents |
