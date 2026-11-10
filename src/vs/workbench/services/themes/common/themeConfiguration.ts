@@ -144,6 +144,9 @@ const themeSettingsConfiguration: IConfigurationNode = {
 };
 configurationRegistry.registerConfiguration(themeSettingsConfiguration);
 
+// z1: Carbon product icons are the default UI icon set.
+configurationRegistry.registerDefaultConfigurations([{ overrides: { [ThemeSettings.PRODUCT_ICON_THEME]: 'icons-carbon' } }]);
+
 const themeSettingsWindowConfiguration: IConfigurationNode = {
 	id: 'window',
 	order: 8.1,
