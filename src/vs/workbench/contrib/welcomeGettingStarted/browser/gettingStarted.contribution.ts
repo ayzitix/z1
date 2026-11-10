@@ -7,7 +7,7 @@ import { localize, localize2 } from '../../../../nls.js';
 import { GettingStartedInputSerializer, GettingStartedPage, inWelcomeContext } from './gettingStarted.js';
 import { Registry } from '../../../../platform/registry/common/platform.js';
 import { EditorExtensions, IEditorFactoryRegistry } from '../../../common/editor.js';
-import { MenuId, registerAction2, Action2 } from '../../../../platform/actions/common/actions.js';
+import { registerAction2, Action2 } from '../../../../platform/actions/common/actions.js';
 import { ServicesAccessor } from '../../../../platform/instantiation/common/instantiation.js';
 import { ContextKeyExpr, IContextKeyService, RawContextKey } from '../../../../platform/contextkey/common/contextkey.js';
 import { IEditorService, SIDE_GROUP } from '../../../services/editor/common/editorService.js';
@@ -27,7 +27,7 @@ import { IRemoteAgentService } from '../../../services/remote/common/remoteAgent
 import { isLinux, isMacintosh, isWindows, OperatingSystem as OS } from '../../../../base/common/platform.js';
 import { IExtensionManagementServerService } from '../../../services/extensionManagement/common/extensionManagement.js';
 import { IExtensionService } from '../../../services/extensions/common/extensions.js';
-import { StartupPageEditorResolverContribution, StartupPageRunnerContribution } from './startupPage.js';
+import { StartupPageEditorResolverContribution } from './startupPage.js';
 import { Categories } from '../../../../platform/action/common/actionCommonCategories.js';
 import { DisposableStore } from '../../../../base/common/lifecycle.js';
 import { AccessibleViewRegistry } from '../../../../platform/accessibility/browser/accessibleViewRegistry.js';
@@ -43,12 +43,6 @@ registerAction2(class extends Action2 {
 			id: 'workbench.action.openWalkthrough',
 			title: localize2('miWelcome', 'Welcome'),
 			category: Categories.Help,
-			f1: true,
-			menu: {
-				id: MenuId.MenubarHelpMenu,
-				group: '1_welcome',
-				order: 1,
-			},
 			metadata: {
 				description: localize2('minWelcomeDescription', 'Opens a Walkthrough to help you get started in VSCodium.')
 			}
@@ -60,6 +54,11 @@ registerAction2(class extends Action2 {
 		walkthroughID: string | { category: string; step: string } | undefined,
 		optionsOrToSide: { toSide?: boolean; inactive?: boolean } | boolean | undefined
 	) {
+		// z1: the plain Welcome page is disabled; only explicit walkthroughs open.
+		if (!walkthroughID) {
+			return;
+		}
+
 		const editorService = accessor.get(IEditorService);
 		const commandService = accessor.get(ICommandService);
 		const configurationService = accessor.get(IConfigurationService);
@@ -204,11 +203,6 @@ registerAction2(class extends Action2 {
 			title: localize2('welcome.showAllWalkthroughs', 'Open Walkthrough...'),
 			category,
 			f1: true,
-			menu: {
-				id: MenuId.MenubarHelpMenu,
-				group: '1_welcome',
-				order: 3,
-			},
 		});
 	}
 
@@ -363,7 +357,6 @@ configurationRegistry.registerConfiguration({
 
 registerWorkbenchContribution2(WorkspacePlatformContribution.ID, WorkspacePlatformContribution, WorkbenchPhase.AfterRestored);
 registerWorkbenchContribution2(StartupPageEditorResolverContribution.ID, StartupPageEditorResolverContribution, WorkbenchPhase.BlockRestore);
-registerWorkbenchContribution2(StartupPageRunnerContribution.ID, StartupPageRunnerContribution, WorkbenchPhase.AfterRestored);
 
 AccessibleViewRegistry.register(new GettingStartedAccessibleView());
 

@@ -44,14 +44,13 @@ import { INotificationService } from '../../../../platform/notification/common/n
 import { Link } from '../../../../platform/opener/browser/link.js';
 import { IOpenerService } from '../../../../platform/opener/common/opener.js';
 import { IProductService } from '../../../../platform/product/common/productService.js';
-import { IFileDialogService } from '../../../../platform/dialogs/common/dialogs.js';
 import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
 import { IStorageService, StorageScope, StorageTarget, WillSaveStateReason } from '../../../../platform/storage/common/storage.js';
 import { firstSessionDateStorageKey, ITelemetryService, TelemetryLevel } from '../../../../platform/telemetry/common/telemetry.js';
 import { getTelemetryLevel } from '../../../../platform/telemetry/common/telemetryUtils.js';
 import { defaultButtonStyles, defaultKeybindingLabelStyles, defaultToggleStyles } from '../../../../platform/theme/browser/defaultStyles.js';
 import { IWindowOpenable } from '../../../../platform/window/common/window.js';
-import { IWorkspaceContextService, UNKNOWN_EMPTY_WINDOW_WORKSPACE, WorkbenchState } from '../../../../platform/workspace/common/workspace.js';
+import { IWorkspaceContextService, UNKNOWN_EMPTY_WINDOW_WORKSPACE } from '../../../../platform/workspace/common/workspace.js';
 import { IRecentFolder, IRecentWorkspace, IRecentlyOpened, IWorkspacesService, isRecentFolder, isRecentWorkspace } from '../../../../platform/workspaces/common/workspaces.js';
 import { OpenRecentAction } from '../../../browser/actions/windowActions.js';
 import { OpenFileFolderAction, OpenFolderAction, OpenFolderViaWorkspaceAction } from '../../../browser/actions/workspaceActions.js';
@@ -172,7 +171,6 @@ export class GettingStartedPage extends EditorPane {
 	private detailsRenderer: GettingStartedDetailsRenderer;
 
 	private readonly categoriesSlideDisposables: DisposableStore;
-	private readonly z1WelcomeDisposables = this._register(new DisposableStore());
 	private showFeaturedWalkthrough = true;
 
 	get editorInput(): GettingStartedInput | undefined {
@@ -198,7 +196,6 @@ export class GettingStartedPage extends EditorPane {
 		@IEditorGroupsService private readonly groupsService: IEditorGroupsService,
 		@IContextKeyService contextService: IContextKeyService,
 		@IQuickInputService private quickInputService: IQuickInputService,
-		@IFileDialogService private readonly fileDialogService: IFileDialogService,
 		@IWorkspacesService private readonly workspacesService: IWorkspacesService,
 		@ILabelService private readonly labelService: ILabelService,
 		@IHostService private readonly hostService: IHostService,
@@ -227,12 +224,6 @@ export class GettingStartedPage extends EditorPane {
 
 		this.contextService = this._register(contextService.createScoped(this.container));
 		inWelcomeContext.bindTo(this.contextService).set(true);
-
-		this._register(this.workspaceContextService.onDidChangeWorkbenchState(() => {
-			if (this.workspaceContextService.getWorkbenchState() !== WorkbenchState.EMPTY) {
-				void this.closeZ1Welcome();
-			}
-		}));
 
 		this.gettingStartedCategories = this.gettingStartedService.getWalkthroughs();
 
@@ -904,95 +895,11 @@ export class GettingStartedPage extends EditorPane {
 		const gettingStartedPage = $('.gettingStarted', {}, this.categoriesPageScrollbar.getDomNode(), this.stepsSlide);
 		this.container.appendChild(gettingStartedPage);
 
-		this.renderZ1Welcome();
 
 		this.categoriesPageScrollbar.scanDomNode();
 		this.detailsPageScrollbar.scanDomNode();
 
 		parent.appendChild(this.container);
-	}
-
-	private renderZ1Welcome(): void {
-		this.z1WelcomeDisposables.clear();
-		this.container.classList.add('z1-welcome');
-		this.container.querySelector('.z1-welcome-page')?.remove();
-
-		const page = $('.z1-welcome-page');
-		const inner = append(page, $('.z1-welcome-inner'));
-
-		const brand = append(inner, $('.z1-welcome-brand'));
-		append(brand, $('.z1-welcome-logo'));
-		append(brand, $('span.z1-welcome-name', {}, 'z1'));
-
-		const grid = append(inner, $('.z1-welcome-grid'));
-		const runAfter = (action: () => Promise<unknown> | void): void => {
-			void (async () => {
-				await action();
-				await this.closeZ1Welcome();
-			})();
-		};
-		const addCard = (icon: string, label: string, action: () => void, className?: string): HTMLButtonElement => {
-			const card = append(grid, $('button.z1-welcome-card')) as HTMLButtonElement;
-			card.setAttribute('type', 'button');
-			card.setAttribute('aria-label', label);
-			if (className) {
-				card.classList.add(className);
-			}
-			append(card, $('span.codicon.codicon-' + icon));
-			append(card, $('span.z1-welcome-card-label', {}, label));
-			this.z1WelcomeDisposables.add(addDisposableListener(card, 'click', () => void action()));
-			return card;
-		};
-
-		addCard('folder', 'Open project', () => { void this.openProject(); }, 'z1-welcome-open');
-		addCard('repo', 'Clone repo', () => runAfter(() => this.commandService.executeCommand('git.clone')));
-		addCard('terminal', 'Connect via SSH', () => { void this.connectViaSSH().then(started => { if (started) { void this.closeZ1Welcome(); } }); });
-		addCard('info', 'About z1', () => this.commandService.executeCommand('workbench.action.showAboutDialog'));
-
-		this.container.appendChild(page);
-	}
-
-	private async openProject(): Promise<void> {
-		const folder = (await this.fileDialogService.showOpenDialog({
-			openLabel: localize('z1.openProject.open', "Open"),
-			title: localize('z1.openProject.title', "Open Project"),
-			canSelectFiles: false,
-			canSelectFolders: true,
-			canSelectMany: false,
-			defaultUri: await this.fileDialogService.defaultFolderPath()
-		}))?.[0];
-		if (!folder) {
-			return;
-		}
-
-		await this.closeZ1Welcome();
-		await this.hostService.openWindow([{ folderUri: folder }], { forceNewWindow: false });
-	}
-
-	private async closeZ1Welcome(): Promise<void> {
-		const input = this.editorInput;
-		if (input) {
-			await this.group.closeEditor(input);
-		}
-	}
-
-	private async connectViaSSH(): Promise<boolean> {
-		const host = await this.quickInputService.input({
-			prompt: localize('z1.connectSsh.prompt', "Connect to an SSH host"),
-			placeHolder: localize('z1.connectSsh.placeholder', "user@host")
-		});
-		if (!host) {
-			return false;
-		}
-
-		try {
-			await this.commandService.executeCommand('workbench.action.terminal.new');
-			await this.commandService.executeCommand('workbench.action.terminal.sendSequence', { text: `ssh ${host}\n` });
-			return true;
-		} catch (error) {
-			this.notificationService.warn(localize('z1.connectSsh.failed', "Could not start SSH session: {0}", String(error)));
-			return false;
-		}
 	}
 
 	private async buildCategoriesSlide(preserveFocus?: boolean) {
@@ -1932,21 +1839,25 @@ export class GettingStartedPage extends EditorPane {
 
 export class GettingStartedInputSerializer implements IEditorSerializer {
 	public canSerialize(editorInput: GettingStartedInput): boolean {
-		return true;
+		// z1: never restore the plain Welcome page, only explicit walkthroughs.
+		return !!editorInput.selectedCategory;
 	}
 
 	public serialize(editorInput: GettingStartedInput): string {
 		return JSON.stringify({ selectedCategory: editorInput.selectedCategory, selectedStep: editorInput.selectedStep });
 	}
 
-	public deserialize(instantiationService: IInstantiationService, serializedEditorInput: string): GettingStartedInput {
+	public deserialize(instantiationService: IInstantiationService, serializedEditorInput: string): GettingStartedInput | undefined {
 
 		return instantiationService.invokeFunction(accessor => {
 			try {
 				const { selectedCategory, selectedStep } = JSON.parse(serializedEditorInput);
+				if (!selectedCategory) {
+					return undefined;
+				}
 				return new GettingStartedInput({ selectedCategory, selectedStep });
 			} catch { }
-			return new GettingStartedInput({});
+			return undefined;
 
 		});
 	}
