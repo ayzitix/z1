@@ -334,7 +334,9 @@ configurationRegistry.registerConfiguration({
 				localize({ comment: ['This is the description for a setting. Values surrounded by single quotes are not to be translated.'], key: 'workbench.startupEditor.terminal' }, "Open a new terminal in the editor area."),
 				localize({ comment: ['This is the description for a setting. Values surrounded by single quotes are not to be translated.'], key: 'workbench.startupEditor.agentSessionsWelcomePage' }, "Open the Agent Sessions Welcome page. Will override the workbench secondary side bar visibility settings."),
 			],
-			'default': 'welcomePage',
+			// z1: empty windows show the custom landing screen in the editor group
+			// instead of opening a Welcome editor tab.
+			'default': 'none',
 			'description': localize('workbench.startupEditor', "Controls which editor is shown at startup, if none are restored from the previous session."),
 			'experiment': { mode: 'auto' },
 			agentsWindow: { default: 'none', readOnly: true },

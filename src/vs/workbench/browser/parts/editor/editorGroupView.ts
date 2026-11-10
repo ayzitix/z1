@@ -54,6 +54,7 @@ import { TelemetryTrustedValue } from '../../../../platform/telemetry/common/tel
 import { defaultProgressBarStyles } from '../../../../platform/theme/browser/defaultStyles.js';
 import { IBoundarySashes } from '../../../../base/browser/ui/sash/sash.js';
 import { EditorGroupWatermark } from './editorGroupWatermark.js';
+import { Z1LandingScreen } from './z1Landing.js';
 import { EditorTitleControl } from './editorTitleControl.js';
 import { EditorPane } from './editorPane.js';
 import { IEditorResolverService } from '../../../services/editor/common/editorResolverService.js';
@@ -206,6 +207,9 @@ export class EditorGroupView extends Themable implements IEditorGroupView {
 
 			// Watermark & shortcuts
 			this._register(this.instantiationService.createInstance(EditorGroupWatermark, this.element));
+
+			// z1 landing screen (empty window background, not an editor tab)
+			this._register(this.instantiationService.createInstance(Z1LandingScreen, this.element, this));
 
 			// Progress bar
 			this.progressBar = this._register(new ProgressBar(this.element, defaultProgressBarStyles));
