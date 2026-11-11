@@ -9,7 +9,9 @@ the z1 brand assets and themes.
 
 ## What is different
 
-- Microsoft telemetry and update pings are removed/blackholed at build time.
+- Telemetry is off: the telemetry level defaults to `none`, the crash reporter
+  defaults to disabled, and `product.json` configures no telemetry or update
+  endpoint.
 - No Microsoft Marketplace: extensions come from **Open VSX**.
 - z1 branding: window/app title, icon, launch command, data folder (`~/.z1`).
 - Themes: **z1 Default** (neutral dark with white accents, default),

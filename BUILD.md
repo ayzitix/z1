@@ -63,8 +63,9 @@ Run:
 ## Known notes
 
 - The optional Rust tunnel CLI is not built by the commands above.
-- Some built-in extensions still contain a `0.0.0.0` placeholder where a
-  Microsoft telemetry endpoint used to be; this is the intended blackhole.
-- Third-party extensions can still send their own telemetry.
+- Telemetry has no endpoint: `product.json` sets no telemetry or update URL,
+  the telemetry level defaults to `none`, and the crash reporter defaults to
+  disabled. There is no host block and no scrub script — the removal is by
+  configuration, so a third-party extension can still send its own telemetry.
 - The source tree is based on Microsoft VS Code (MIT) and VSCodium (MIT);
   see `NOTICE.md`.
