@@ -42,6 +42,12 @@
 	background: url('../../../../browser/media/code-icon.svg') center / contain no-repeat;
 }
 
+/* The mark is white; invert it on a light theme so it reads on the tooltip. */
+.monaco-workbench.vs .update-tooltip .product-logo {
+	filter: invert(1);
+}
+}
+
 .update-tooltip .product-details {
 	display: flex;
 	flex-direction: column;

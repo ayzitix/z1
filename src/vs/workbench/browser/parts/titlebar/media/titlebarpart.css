@@ -300,6 +300,13 @@
 	background-size: 16px;
 }
 
+/* The mark is drawn white for the dark title bar; invert it on a light one, where
+ * a white body would disappear. The eyes invert from dark to light to stay legible. */
+.monaco-workbench.vs .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon:not(.codicon),
+.monaco-workbench.vs .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon:not(.codicon):hover {
+	filter: invert(1);
+}
+
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon.codicon {
 	line-height: 30px;
 }

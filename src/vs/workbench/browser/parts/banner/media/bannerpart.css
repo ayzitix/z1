@@ -36,6 +36,11 @@
 	margin: 0 6px 0 10px;
 }
 
+/* Inverted on a light theme, where the white body of the mark would vanish. */
+.monaco-workbench.vs .part.banner .icon-container.custom-icon {
+	filter: invert(1);
+}
+
 .monaco-workbench .part.banner .message-container {
 	line-height: 26px;
 	text-overflow: ellipsis;
