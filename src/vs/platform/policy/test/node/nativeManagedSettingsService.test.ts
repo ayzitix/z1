@@ -72,7 +72,7 @@ suite('NativeManagedSettingsService', () => {
 	test('applies native telemetry file path updates and removals without watcher metadata', async () => {
 		const filePath = 'telemetry.filePath';
 		let onDidChange: ((update: Record<string, PolicyValue | undefined>) => void) | undefined;
-		const watcherFactory: NativePolicyWatcherFactory = (_productName, _policies, callback) => {
+		const watcherFactory: NativePolicyWatcherFactory = (_venderName, _productName, _policies, callback) => {
 			onDidChange = callback;
 			callback({});
 			return Disposable.None;
@@ -98,7 +98,7 @@ suite('NativeManagedSettingsService', () => {
 	test('observes strict marketplace policy without a configuration registration and preserves channel precedence', async () => {
 		const key = COPILOT_STRICT_MARKETPLACES_KEY;
 		let update: ((values: Record<string, PolicyValue | undefined>) => void) | undefined;
-		const watcherFactory: NativePolicyWatcherFactory = (_productName, policies, callback) => {
+		const watcherFactory: NativePolicyWatcherFactory = (_venderName, _productName, policies, callback) => {
 			assert.deepStrictEqual(policies[key], { type: 'string' });
 			update = callback;
 			callback({ [key]: '[]' });
@@ -121,7 +121,7 @@ suite('NativeManagedSettingsService', () => {
 	for (const leaf of ['prompts', 'responses', 'toolArguments', 'toolOutput', 'policyDetail']) {
 		test(`native capture.${leaf} selects telemetry without a corresponding Local capture policy`, async () => {
 			const key = `telemetry.capture.${leaf}`;
-			const watcherFactory: NativePolicyWatcherFactory = (_productName, policies, callback) => {
+			const watcherFactory: NativePolicyWatcherFactory = (_venderName, _productName, policies, callback) => {
 				assert.deepStrictEqual(policies[key], { type: 'boolean' });
 				callback({ [key]: false });
 				return Disposable.None;
@@ -137,7 +137,7 @@ suite('NativeManagedSettingsService', () => {
 	test('without observed declared telemetry keys, native delivery leaves the server block active', async () => {
 		let onDidChange: ((update: Record<string, PolicyValue | undefined>) => void) | undefined;
 		const key = 'telemetry.capture.prompts';
-		const watcherFactory: NativePolicyWatcherFactory = (_productName, policies, callback) => {
+		const watcherFactory: NativePolicyWatcherFactory = (_venderName, _productName, policies, callback) => {
 			assert.deepStrictEqual({
 				block: policies.telemetry,
 				unknown: policies['telemetry.futureControl'],
@@ -170,7 +170,7 @@ suite('NativeManagedSettingsService', () => {
 			'permissions.limitTo': { type: 'string' },
 		};
 		let watched = {};
-		const service = disposables.add(new NativeManagedSettingsService(new NullLogService(), 'com.github.copilot', undefined, (_name, policies, callback) => {
+		const service = disposables.add(new NativeManagedSettingsService(new NullLogService(), 'com.github.copilot', undefined, (_vendorName, _name, policies, callback) => {
 			watched = Object.fromEntries(Object.entries(policies).filter(([key]) => key.startsWith('permissions.')));
 			callback({ 'permissions.disableAssistedPermissionsMode': false, 'permissions.defaultMode': 'manual' });
 			return Disposable.None;

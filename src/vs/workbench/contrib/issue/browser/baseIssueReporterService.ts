@@ -83,7 +83,8 @@ export class BaseIssueReporterService extends Disposable {
 		public product: IProductConfiguration,
 		public readonly window: Window,
 		public readonly isWeb: boolean,
-		private readonly fetcher: typeof fetch = (input, init) => fetch(input, init),
+		// Kept for the subclasses that pass a fetcher; nothing in this class reads it.
+		_fetcher: typeof fetch = (input, init) => fetch(input, init),
 		@IIssueFormService public readonly issueFormService: IIssueFormService,
 		@IThemeService public readonly themeService: IThemeService,
 		@IFileService public readonly fileService: IFileService,
