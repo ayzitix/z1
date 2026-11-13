@@ -1,4 +1,17 @@
-# z1
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="branding/banner-dark.svg">
+    <img src="branding/banner-light.svg" alt="z1 editor" width="100%">
+  </picture>
+</p>
+
+<p align="center">
+  <a href="LICENSE.txt"><img alt="license" src="https://img.shields.io/badge/license-MIT-0b0b0b?style=flat-square"></a>
+  <img alt="node" src="https://img.shields.io/badge/node-24.18-0b0b0b?style=flat-square">
+  <img alt="status" src="https://img.shields.io/badge/status-builds-0b0b0b?style=flat-square">
+</p>
+
+**A code editor built from the VS Code source, with its own engine.**
 
 z1 is a custom code editor built on the **Visual Studio Code** source (1.143.1)
 with VSCodium's freedom-preserving patches and z1 branding.
@@ -14,13 +27,20 @@ the z1 brand assets and themes.
   endpoint.
 - No Microsoft Marketplace: extensions come from **Open VSX**.
 - z1 branding: window/app title, icon, launch command, data folder (`~/.z1`).
-- Themes: **z1 Default** (neutral dark with white accents, default),
-  **z1 Soft**, and **z1 Dark** (lime/pink).
+- Themes: **z1 Ocean** (white surfaces, black accents, default light),
+  **z1 Default** (neutral dark, default dark), and **z1 Soft**.
 - Cursor-style Welcome screen with `Open project`, `Clone repo`,
   `Connect via SSH`, and `About z1` cards.
 - Empty-editor watermark: rotating z1 body, cursor-tracking eyes, static eyes.
 - Strict 90-degree UI (all border radii are 0).
 - Activity Bar is fixed to the top.
+
+## Engine
+
+The agent runtime is [z1-sdk](https://github.com/ayzitix/z1-sdk): a journaled
+node-graph engine with modules, branch memory and a headless server. The editor
+does not start it yet — integration is the next step. Today it runs from its own
+CLI (`z1 run`, `z1 serve`, `z1 studio`).
 
 ## Build
 
@@ -78,6 +98,11 @@ A full `./z1-build.sh` is only needed for a new portable artifact.
 | `branding/` | z1 logo, PNG/ICO sizes, watermarks, theme JSON sources |
 | `product.json` | z1 product identity (name, gallery, URLs) |
 | `package.json` | source package metadata |
+
+## Documentation
+
+Architecture, commands, decisions and gotchas live in
+[z1-docs](https://github.com/ayzitix/z1-docs).
 
 ## License and attribution
 
