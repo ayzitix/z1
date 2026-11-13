@@ -8,19 +8,4 @@
   <text x="300" y="180" fill="#F5F5F3" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="72" font-weight="700" letter-spacing="-3">z1 editor</text>
   <text x="302" y="228" fill="#9A9A9A" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="23">A code editor built from the VS Code source.</text>
   <text x="302" y="258" fill="#9A9A9A" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="23">Its own engine, its own themes.</text>
-  <g stroke="#2A2A2A" stroke-width="2" fill="none">
-    <rect x="940" y="90" width="280" height="180" rx="10"/>
-    <path d="M940 126 H1220"/>
-  </g>
-  <g fill="#2A2A2A">
-    <circle cx="960" cy="108" r="4"/>
-    <circle cx="976" cy="108" r="4"/>
-    <circle cx="992" cy="108" r="4"/>
-  </g>
-  <g stroke="#2A2A2A" stroke-width="2" opacity="0.8">
-    <path d="M968 156 H1050"/>
-    <path d="M968 178 H1120"/>
-    <path d="M968 200 H1080"/>
-    <path d="M968 222 H1140"/>
-  </g>
 </svg>

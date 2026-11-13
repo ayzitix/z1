@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="branding/banner-dark.svg">
-    <img src="branding/banner-light.svg" alt="z1 editor" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="branding/hero-dark.svg">
+    <img src="branding/hero-light.svg" alt="z1 editor" width="100%">
   </picture>
 </p>
 
